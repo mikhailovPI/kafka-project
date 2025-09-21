@@ -19,7 +19,7 @@ public class ProducerService {
 
     public CompletableFuture<RecordMetadata> publish(Message message) {
         log.info("[PRODUCER] OUT {}", message);
-        ProducerRecord<String, Message> record = new ProducerRecord<>(message.getTopic(), message.getKey(), message);
+        ProducerRecord<String, Message> record = new ProducerRecord<>(message.topic(), message.key(), message);
         CompletableFuture<RecordMetadata> completableFuture = new CompletableFuture<>();
         kafkaProducer.send(record, (md, ex) -> {
             if (ex != null) {

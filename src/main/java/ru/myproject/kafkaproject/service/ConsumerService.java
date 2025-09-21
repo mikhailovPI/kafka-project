@@ -10,6 +10,7 @@ import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Service;
 import ru.myproject.kafkaproject.config.KafkaConfig;
 import ru.myproject.kafkaproject.model.Message;
+import ru.myproject.kafkaproject.model.TopicRequest;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -30,9 +31,9 @@ public class ConsumerService {
     private KafkaConsumer<String, Message> singleConsumerRef;
     private KafkaConsumer<String, Message> batchConsumerRef;
 
-    public void singleConsumeMessage(String topic) {
+    public void singleConsumeMessage(TopicRequest topic) {
         if (singleRunning) {
-            log.info("[SINGLE] already running on topic={}", topic);
+            log.info("[SINGLE] already running on topic={}", topic.topic());
             return;
         }
         singleRunning = true;
@@ -40,8 +41,8 @@ public class ConsumerService {
         singleThread = new Thread(() -> {
             try (KafkaConsumer<String, Message> consumer = new KafkaConsumer<>(kafkaConfig.singleConsumerProps())) {
                 singleConsumerRef = consumer;
-                consumer.subscribe(List.of(topic));
-                log.info("[SINGLE] subscribed to {}", topic);
+                consumer.subscribe(List.of(topic.topic()));
+                log.info("[SINGLE] subscribed to {}", topic.topic());
 
                 while (singleRunning) {
                     try {
@@ -72,9 +73,9 @@ public class ConsumerService {
         singleThread.start();
     }
 
-    public void batchConsumeMessage(String topic) {
+    public void batchConsumeMessage(TopicRequest topic) {
         if (batchRunning) {
-            log.info("[BATCH] already running on topic={}", topic);
+            log.info("[BATCH] already running on topic={}", topic.topic());
             return;
         }
         batchRunning = true;
@@ -82,8 +83,8 @@ public class ConsumerService {
         batchThread = new Thread(() -> {
             try (KafkaConsumer<String, Message> consumer = new KafkaConsumer<>(kafkaConfig.batchConsumerProps())) {
                 batchConsumerRef = consumer;
-                consumer.subscribe(List.of(topic));
-                log.info("[BATCH] subscribed to {}", topic);
+                consumer.subscribe(List.of(topic.topic()));
+                log.info("[BATCH] subscribed to {}", topic.topic());
 
                 final int minBatch = 10;
                 final long assembleTimeoutMs = 1000;

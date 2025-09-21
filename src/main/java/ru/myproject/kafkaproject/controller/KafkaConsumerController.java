@@ -1,11 +1,11 @@
 package ru.myproject.kafkaproject.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.message.DescribeProducersRequestData;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.myproject.kafkaproject.model.TopicRequest;
 import ru.myproject.kafkaproject.service.ConsumerService;
 
 import java.util.Map;
@@ -18,13 +18,13 @@ public class KafkaConsumerController {
     private final ConsumerService consumerService;
 
     @PostMapping("/consume/single")
-    public ResponseEntity<?> singleConsume(@RequestParam String topic) {
+    public ResponseEntity<?> singleConsume(@RequestBody @Valid TopicRequest topic) {
         consumerService.singleConsumeMessage(topic);
         return ResponseEntity.accepted().body(Map.of("singleRunning", true, "topic", topic));
     }
 
     @PostMapping("/consume/batch")
-    public ResponseEntity<?> batchConsume(@RequestParam String topic) {
+    public ResponseEntity<?> batchConsume(@RequestBody @Valid TopicRequest topic) {
         consumerService.batchConsumeMessage(topic);
         return ResponseEntity.accepted().body(Map.of("batchRunning", true, "topic", topic));
     }
